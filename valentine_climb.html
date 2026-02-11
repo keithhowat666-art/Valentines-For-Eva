@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Eva 🌅</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
+
+  :root {
+    --sky1: #1a0a2e;
+    --sky2: #2d1b4e;
+    --sky3: #6b2d6b;
+    --sky4: #c4526a;
+    --sky5: #e8845a;
+    --sky6: #f4b96b;
+    --sky7: #fde3a0;
+    --rock: #5a4a3a;
+    --rock2: #7a6a5a;
+    --rock3: #9a8a7a;
+    --snow: #fef9f0;
+    --water: #4a9ab5;
+    --water2: #6abdd4;
+    --foam: #c8eef8;
+    --moss: #4a7a3a;
+    --correct: #7adb78;
+    --wrong: #ff6b6b;
+    --pixel: 4px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; image-rendering: pixelated; }
+
+  body {
+    background: #1a0a2e;
+    font-family: 'Press Start 2P', monospace;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #gameWrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* SKY */
+  #sky {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom,
+      #1a0a2e 0%,
+      #2d1b4e 15%,
+      #6b2d6b 35%,
+      #c4526a 55%,
+      #e8845a 70%,
+      #f4b96b 82%,
+      #fde3a0 92%,
+      #fff4cc 100%
+    );
+    transition: filter 2s ease;
+  }
+
+  /* STARS */
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 2s infinite alternate;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+  }
+
+  /* SUN */
+  #sun {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: #ffd700;
+    border-radius: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -80px;
+    box-shadow: 0 0 40px #ffaa00, 0 0 80px #ff8800, 0 0 120px rgba(255,180,0,0.3);
+    transition: bottom 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    image-rendering: auto;
+  }
+  #sun::before {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(255,220,100,0.3);
+    border-radius: 50%;
+    top: -10px;
+    left: -10px;
+  }
+
+  /* MOUNTAIN */
+  #mountain {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 85%;
+  }
+
+  canvas#mountainCanvas {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* CLIMBER */
+  #climber {
+    position: absolute;
+    width: 32px;
+    height: 48px;
+    transition: left 1s ease, bottom 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 20;
+  }
+
+  canvas#climberCanvas {
+    width: 32px;
+    height: 48px;
+  }
+
+  /* UI OVERLAY */
+  #ui {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 30;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 30px;
+  }
+
+  /* PROGRESS */
+  #progress {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: 'Press Start 2P', monospace;
+    color: #fde3a0;
+    font-size: 10px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+    letter-spacing: 1px;
+  }
+
+  #progressBar {
+    width: 120px;
+    height: 12px;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid #fde3a0;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #e8845a, #fde3a0);
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+
+  /* QUESTION BOX */
+  #questionBox {
+    pointer-events: all;
+    background: rgba(10, 5, 25, 0.88);
+    border: 3px solid #f4b96b;
+    border-radius: 0px;
+    padding: 24px 28px;
+    max-width: 620px;
+    width: 92%;
+    box-shadow: 0 0 0 2px rgba(244,185,107,0.2), 6px 6px 0 rgba(0,0,0,0.5);
+    image-rendering: auto;
+    margin-bottom: 10px;
+  }
+
+  #questionText {
+    font-family: 'VT323', monospace;
+    color: #fde3a0;
+    font-size: 22px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+    letter-spacing: 0.5px;
+  }
+
+  #questionLabel {
+    font-family: 'Press Start 2P', monospace;
+    color: #e8845a;
+    font-size: 8px;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+
+  .answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .answer-btn {
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(244,185,107,0.5);
+    color: #fde3a0;
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.3;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    letter-spacing: 0.3px;
+  }
+
+  .answer-btn:hover {
+    background: rgba(244,185,107,0.15);
+    border-color: #f4b96b;
+    transform: translateX(2px);
+  }
+
+  .answer-btn.correct {
+    background: rgba(122,219,120,0.2);
+    border-color: #7adb78;
+    color: #7adb78;
+  }
+
+  .answer-btn.wrong {
+    background: rgba(255,107,107,0.2);
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+
+  .answer-btn:disabled {
+    cursor: default;
+  }
+
+  /* FEEDBACK */
+  #feedback {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    margin-top: 12px;
+    min-height: 28px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* TITLE SCREEN */
+  #titleScreen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 5, 25, 0.92);
+    pointer-events: all;
+  }
+
+  #titleScreen h1 {
+    font-family: 'Press Start 2P', monospace;
+    color: #f4b96b;
+    font-size: clamp(14px, 3vw, 22px);
+    text-align: center;
+    line-height: 1.8;
+    text-shadow: 3px 3px 0 #c4526a, 6px 6px 0 rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+
+  #titleScreen p {
+    font-family: 'VT323', monospace;
+    color: #fde3a0;
+    font-size: 22px;
+    margin-bottom: 40px;
+    text-align: center;
+    max-width: 500px;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+    padding: 0 20px;
+  }
+
+  #startBtn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #c4526a, #e8845a);
+    color: white;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 2px;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+
+  #startBtn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+  }
+
+  #startBtn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  }
+
+  /* VALENTINE SCREEN */
+  #valentineScreen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 5, 25, 0.1);
+    pointer-events: all;
+    text-align: center;
+    padding: 20px;
+  }
+
+  #valentineScreen.active {
+    display: flex;
+  }
+
+  #valentineMsg {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(12px, 2.5vw, 20px);
+    color: #fde3a0;
+    text-shadow: 3px 3px 0 #c4526a, 0 0 30px rgba(244,185,107,0.8);
+    line-height: 2;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  #valentineMsg.reveal {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .heart-burst {
+    position: absolute;
+    font-size: 24px;
+    animation: burst 2s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes burst {
+    0% { transform: translate(0,0) scale(0); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
+  }
+
+  /* SHAKE ANIMATION */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+
+  .shake {
+    animation: shake 0.4s ease;
+  }
+
+  /* CLOUDS */
+  .cloud {
+    position: absolute;
+    background: rgba(255,240,220,0.25);
+    border-radius: 50px;
+    animation: cloudDrift linear infinite;
+  }
+
+  @keyframes cloudDrift {
+    from { transform: translateX(-200px); }
+    to { transform: translateX(calc(100vw + 200px)); }
+  }
+
+  /* MIST */
+  #mist {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(to top, rgba(254,227,160,0.15), transparent);
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* pixel heart decoration */
+  .pixel-heart {
+    display: inline-block;
+    color: #ff6b8a;
+    text-shadow: 0 0 8px rgba(255,107,138,0.7);
+  }
+</style>
+</head>
+<body>
+<div id="gameWrapper">
+  <div id="sky"></div>
+  <div id="mist"></div>
+
+  <!-- Sun -->
+  <div id="sun"></div>
+
+  <!-- Mountain Canvas -->
+  <canvas id="mountainCanvas"></canvas>
+
+  <!-- Climber -->
+  <div id="climber">
+    <canvas id="climberCanvas" width="32" height="48"></canvas>
+  </div>
+
+  <!-- UI -->
+  <div id="ui">
+    <div id="progress">
+      SUMMIT<br>
+      <div id="progressBar"><div id="progressFill"></div></div>
+    </div>
+    <div id="questionBox">
+      <div id="questionLabel">QUESTION 1 OF 7</div>
+      <div id="questionText"></div>
+      <div class="answers" id="answersDiv"></div>
+      <div id="feedback"></div>
+    </div>
+  </div>
+
+  <!-- Title Screen -->
+  <div id="titleScreen">
+    <h1>SUMMIT<br>CHALLENGE<br><span style="color:#e8845a;font-size:0.7em">for Eva</span></h1>
+    <p>Can you make it to the top of the mountain? Answer 7 questions and reach the summit at sunrise...</p>
+    <button id="startBtn" onclick="startGame()">▶ START CLIMB</button>
+  </div>
+
+  <!-- Valentine Screen -->
+  <div id="valentineScreen" id="valentineScreen">
+    <div id="valentineMsg"></div>
+  </div>
+</div>
+
+<script>
+// ─── QUESTION LIBRARY (shuffled each game) ─────────────────────────
+const questionLibrary = [
+  // Rock climbing
+  {
+    q: "What's the rating system used for rock climbing in North America?",
+    answers: ["Yosemite Decimal", "Boulder Scale", "Alpine Grade", "French Numeric"],
+    correct: 0,
+    fun: "Good Job Dingus"
+  },
+  {
+    q: "In climbing, what does 'sending' a route mean?",
+    answers: ["Falling off it", "Successfully completing it", "Giving up halfway", "Bolting a new route"],
+    correct: 1,
+    fun: "Lowkey didn't know that"
+  },
+  {
+    q: "What do climbers put on their hands to improve grip?",
+    answers: ["Hairspray", "Chalk", "Resin", "Sand"],
+    correct: 1,
+    fun: "free bee"
+  },
+  {
+    q: "What is 'bouldering'?",
+    answers: ["Climbing with a rope", "Low height climbing without ropes", "Ice climbing", "Speed climbing on a wall"],
+    correct: 1,
+    fun: "boulder :P"
+  },
+  {
+    q: "What does a 'belay device' do in climbing?",
+    answers: ["Measures altitude", "Controls the rope to catch falls", "Tracks your route", "Hooks into the rock"],
+    correct: 1,
+    fun: "Did i add too many rock climbing facts?"
+  },
+
+  // Neuroscience
+  {
+    q: "Which part of the brain is most associated with fear responses?",
+    answers: ["The Amygdala", "The Cerebellum", "The Hippocampus", "The Frontal Lobe"],
+    correct: 0,
+    fun: "Calm lil studying"
+  },
+  {
+    q: "What is the main neurotransmitter released during a thrilling climb?",
+    answers: ["Serotonin", "Dopamine", "Melatonin", "GABA"],
+    correct: 1,
+    fun: "oooo brain chemicals"
+  },
+  {
+    q: "The hippocampus is primarily associated with which function?",
+    answers: ["Vision", "Memory and navigation", "Heart rate", "Breathing"],
+    correct: 1,
+    fun: "🦛"
+  },
+  {
+    q: "What percentage of the brain is water?",
+    answers: ["50%", "60%", "73%", "90%"],
+    correct: 2,
+    fun: "You'll never see this message cuz i got like 100 questions in here"
+  },
+  {
+    q: "Which lobe of the brain handles decision-making and personality?",
+    answers: ["Occipital", "Parietal", "Temporal", "Frontal"],
+    correct: 3,
+    fun: "Lets get a lobotomy together"
+  },
+  // Would You Rather
+  {
+    q: "Would you rather be an Isopod or a Termite",
+    answers: ["Isopod", "🦛", "Termite", "Neither, I'm good"],
+    correct: 2,
+    fun: "Isopod cooler"
+  },
+  {
+    q: "Which dinosaur does Eva like more?",
+    answers: ["Arceoptyrx/Coelophysis", "Keith ur a big nerd", "Ankylosaurus/Dipldocus", "Chicken"],
+    correct: 2,
+    fun: "when she into dinosaur 😍"
+  },
+  {
+    q: "Would you rather have 2 billion dollars and eat 2 grapes, or 2 billion grapes and eat 2 dollars?",
+    answers: ["I have no need for such trivial questions", "2 billy dollas ", "2 billy grapes", "I wan't the money 🤓"],
+    correct: 2,
+    fun: "good choice"
+  },
+  // About you two / personal
+  {
+    q: "You two met through a mutual friend. What's his name?",
+    answers: ["Bartholomew", "Gavin", "Mathias", "Tiddlebocker"],
+    correct: 1,
+    fun: "ily gavin"
+  },
+  {
+    q: "Which University do you go to?",
+    answers: ["University of Toronto", "McMaster", "University of Waterloo", "University of Guelph"],
+    correct: 3,
+    fun: "Yall's mascot is a Gryphon?"
+  },
+  {
+    q: "Which Country am I from",
+    answers: ["Malaysia", "Philippines", "Indonesia", "Vietnam"],
+    correct: 2,
+    fun: "I'll make you indonesian food one day"
+  },
+  {
+    q: "What's the tallest volcano in Indonesia?",
+    answers: ["Mount Merapi", "Mount Rinjani", "Mount Semeru", "Mount Bromo"],
+    correct: 2,
+    fun: "You search this one up >:("
+  },
+  // Wordle / fun
+  {
+    q: "Best Wordle opening word according to most experts?",
+    answers: ["CRANE", "ADIEU", "SLATE", "AUDIO"],
+    correct: 2,
+    fun: "Theres levels to ts"
+  },
+  {
+    q: "In Wordle, what does a YELLOW tile mean?",
+    answers: ["Letter is correct", "Letter is in the word but wrong spot", "Letter not in word", "You've won"],
+    correct: 1,
+    fun: "This is lowkey just filler question"
+  },
+  {
+    q: "How many guesses do you get in a standard Wordle?",
+    answers: ["4", "5", "6", "7"],
+    correct: 2,
+    fun: "More filler question"
+  },
+];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// The final question is always this one — it triggers the summit climb
+const finalQuestion = {
+  q: "Can we hangout Saturday?",
+  answers: ["ehhh sure", "Please Yea 😛", "you kinda smell, but sure", "No ⚠️"],
+  correct: 2,
+  fun: "..."
+};
+
+// Active questions for this run — 6 shuffled from the library + the final question locked at the end
+let questions = [];
+function buildQuestionSet() {
+  questions = [...shuffle(questionLibrary).slice(0, 6), finalQuestion];
+}
+// current = index into questions[] of the question she must answer NEXT
+// climberStep = visual position (0–7)
+let current = 0;
+let answered = false;
+let gameStarted = false;
+
+const W = window.innerWidth;
+const H = window.innerHeight;
+
+// ─── DRAW MOUNTAIN ───────────────────────────────────────────────────
+const mc = document.getElementById('mountainCanvas');
+mc.width = W;
+mc.height = H;
+const mctx = mc.getContext('2d');
+
+function drawMountain() {
+  mctx.clearRect(0, 0, W, H);
+
+  const baseY = H;
+  const peakX = W * 0.5;
+  const peakY = H * 0.08;
+
+  // --- Far background ridge (lighter) ---
+  mctx.beginPath();
+  mctx.moveTo(0, baseY);
+  mctx.lineTo(W * 0.1, H * 0.45);
+  mctx.lineTo(W * 0.28, H * 0.22);
+  mctx.lineTo(W * 0.45, H * 0.38);
+  mctx.lineTo(W * 0.62, H * 0.18);
+  mctx.lineTo(W * 0.78, H * 0.35);
+  mctx.lineTo(W, H * 0.3);
+  mctx.lineTo(W, baseY);
+  mctx.closePath();
+  const ridgeGrad = mctx.createLinearGradient(0, H*0.18, 0, baseY);
+  ridgeGrad.addColorStop(0, 'rgba(100,80,70,0.5)');
+  ridgeGrad.addColorStop(1, 'rgba(70,55,45,0.7)');
+  mctx.fillStyle = ridgeGrad;
+  mctx.fill();
+
+  // --- Main mountain ---
+  mctx.beginPath();
+  mctx.moveTo(0, baseY);
+  mctx.lineTo(W * 0.05, H * 0.55);
+  mctx.lineTo(W * 0.18, H * 0.35);
+  mctx.quadraticCurveTo(W * 0.3, H * 0.28, peakX * 0.78, H * 0.18);
+  mctx.quadraticCurveTo(W * 0.44, H * 0.12, peakX, peakY);
+  mctx.quadraticCurveTo(W * 0.56, H * 0.12, W * 0.65, H * 0.18);
+  mctx.lineTo(W * 0.82, H * 0.35);
+  mctx.lineTo(W * 0.95, H * 0.55);
+  mctx.lineTo(W, baseY);
+  mctx.closePath();
+
+  const mainGrad = mctx.createLinearGradient(peakX, peakY, peakX, baseY);
+  mainGrad.addColorStop(0, '#6b5545');
+  mainGrad.addColorStop(0.3, '#7a6455');
+  mainGrad.addColorStop(0.7, '#8a7465');
+  mainGrad.addColorStop(1, '#5a4535');
+  mctx.fillStyle = mainGrad;
+  mctx.fill();
+
+  // Rocky texture patches
+  const patches = [
+    [W*0.35, H*0.35, W*0.15, H*0.12],
+    [W*0.55, H*0.30, W*0.12, H*0.10],
+    [W*0.25, H*0.50, W*0.18, H*0.08],
+    [W*0.60, H*0.48, W*0.15, H*0.09],
+  ];
+  patches.forEach(([x, y, w, h]) => {
+    mctx.beginPath();
+    mctx.ellipse(x, y, w, h, 0, 0, Math.PI*2);
+    mctx.fillStyle = 'rgba(100,85,70,0.4)';
+    mctx.fill();
+  });
+
+  // Left face shading
+  mctx.beginPath();
+  mctx.moveTo(peakX, peakY);
+  mctx.lineTo(W*0.18, H*0.35);
+  mctx.lineTo(W*0.05, H*0.55);
+  mctx.lineTo(0, baseY);
+  mctx.lineTo(W*0.32, baseY);
+  mctx.closePath();
+  mctx.fillStyle = 'rgba(0,0,0,0.15)';
+  mctx.fill();
+
+  // Snow cap
+  mctx.beginPath();
+  mctx.moveTo(peakX, peakY - 8);
+  mctx.quadraticCurveTo(peakX + W*0.04, peakY + H*0.03, peakX + W*0.07, peakY + H*0.05);
+  mctx.quadraticCurveTo(peakX, peakY + H*0.02, peakX - W*0.07, peakY + H*0.05);
+  mctx.quadraticCurveTo(peakX - W*0.04, peakY + H*0.03, peakX, peakY - 8);
+  const snowGrad = mctx.createRadialGradient(peakX, peakY, 0, peakX, peakY, W*0.08);
+  snowGrad.addColorStop(0, 'rgba(255,248,240,0.95)');
+  snowGrad.addColorStop(1, 'rgba(220,200,180,0.4)');
+  mctx.fillStyle = snowGrad;
+  mctx.fill();
+
+  // --- Climbing path (rope/chalk line) ---
+  mctx.beginPath();
+  mctx.moveTo(W*0.48, baseY * 0.92);
+  mctx.bezierCurveTo(W*0.47, H*0.7, W*0.49, H*0.5, W*0.50, H*0.35);
+  mctx.bezierCurveTo(W*0.505, H*0.25, W*0.498, H*0.15, peakX, peakY + 20);
+  mctx.strokeStyle = 'rgba(255,220,150,0.4)';
+  mctx.lineWidth = 3;
+  mctx.setLineDash([8, 10]);
+  mctx.stroke();
+  mctx.setLineDash([]);
+
+  // --- WATERFALL (right side) ---
+  const wfX = W * 0.76;
+  const wfTopY = H * 0.28;
+  const wfBotY = H * 0.72;
+  const wfW = 28;
+
+  // Waterfall body
+  const wfGrad = mctx.createLinearGradient(wfX, wfTopY, wfX, wfBotY);
+  wfGrad.addColorStop(0, 'rgba(180,230,255,0.8)');
+  wfGrad.addColorStop(0.5, 'rgba(140,200,240,0.6)');
+  wfGrad.addColorStop(1, 'rgba(180,240,255,0.4)');
+  mctx.beginPath();
+  mctx.moveTo(wfX - wfW/2, wfTopY);
+  mctx.bezierCurveTo(wfX - wfW, wfTopY + (wfBotY-wfTopY)*0.3, wfX + wfW, wfTopY + (wfBotY-wfTopY)*0.6, wfX - wfW/2, wfBotY);
+  mctx.lineTo(wfX + wfW/2, wfBotY);
+  mctx.bezierCurveTo(wfX + wfW, wfTopY + (wfBotY-wfTopY)*0.6, wfX - wfW, wfTopY + (wfBotY-wfTopY)*0.3, wfX + wfW/2, wfTopY);
+  mctx.closePath();
+  mctx.fillStyle = wfGrad;
+  mctx.fill();
+
+  // Waterfall shimmer lines
+  for (let i = 0; i < 5; i++) {
+    const lx = wfX - 8 + i * 5;
+    mctx.beginPath();
+    mctx.moveTo(lx, wfTopY);
+    mctx.lineTo(lx - 3 + Math.random()*6, wfBotY);
+    mctx.strokeStyle = 'rgba(220,245,255,0.5)';
+    mctx.lineWidth = 1.5;
+    mctx.stroke();
+  }
+
+  // Pool at bottom
+  mctx.beginPath();
+  mctx.ellipse(wfX, wfBotY + 15, 35, 14, 0, 0, Math.PI*2);
+  const poolGrad = mctx.createRadialGradient(wfX, wfBotY+15, 0, wfX, wfBotY+15, 35);
+  poolGrad.addColorStop(0, 'rgba(160,220,255,0.7)');
+  poolGrad.addColorStop(1, 'rgba(100,180,220,0.3)');
+  mctx.fillStyle = poolGrad;
+  mctx.fill();
+
+  // Foam
+  for (let i = 0; i < 6; i++) {
+    const fx = wfX - 20 + Math.random() * 40;
+    const fy = wfBotY + 5 + Math.random() * 18;
+    mctx.beginPath();
+    mctx.arc(fx, fy, 4 + Math.random()*4, 0, Math.PI*2);
+    mctx.fillStyle = 'rgba(220,245,255,0.6)';
+    mctx.fill();
+  }
+
+  // Moss/greenery patches
+  const mossSpots = [[W*0.68, H*0.58], [W*0.72, H*0.65], [W*0.62, H*0.62], [W*0.78, H*0.60]];
+  mossSpots.forEach(([mx, my]) => {
+    mctx.beginPath();
+    mctx.ellipse(mx, my, 22, 10, -0.3, 0, Math.PI*2);
+    mctx.fillStyle = 'rgba(60,100,50,0.5)';
+    mctx.fill();
+  });
+
+  // Ground base
+  const groundGrad = mctx.createLinearGradient(0, baseY*0.88, 0, baseY);
+  groundGrad.addColorStop(0, '#4a3828');
+  groundGrad.addColorStop(1, '#2a1808');
+  mctx.fillRect(0, baseY * 0.90, W, H * 0.12);
+}
+
+
+
+function renderClimber() {
+  const cc = document.getElementById('climberCanvas');
+  const cctx = cc.getContext('2d');
+  cctx.clearRect(0, 0, 32, 48);
+
+  const p = (x, y, col) => {
+    cctx.fillStyle = col;
+    cctx.fillRect(x * 4, y * 4, 4, 4);
+  };
+
+  const skin     = '#c07850'; // warm medium-brown Indian skin
+  const skinDark = '#9a5c34';
+  const hair     = '#150c05'; // deep near-black
+  const helm     = '#2a8a7a'; // teal helmet
+  const helmD    = '#1a6a5a';
+  const jacket   = '#b83838'; // terracotta red jacket
+  const jacketL  = '#d05848';
+  const gold     = '#e8b840'; // harness
+  const pants    = '#2a2840';
+  const pantsD   = '#181625';
+  const boot     = '#2a1408';
+
+  // Helmet
+  [2,3,4,5].forEach(x => p(x, 0, helm));
+  [1,2,3,4,5,6].forEach(x => p(x, 1, helmD));
+  // Hair peeking under helmet sides
+  p(1, 1, hair); p(6, 1, hair);
+  // Helmet chin strap
+  p(1, 2, helmD); p(6, 2, helmD);
+
+  // Face
+  [2,3,4,5].forEach(x => p(x, 2, skin));
+  // Eyes
+  p(2,3,skin); p(3,3,hair); p(4,3,skin); p(5,3,hair);
+  // Nose + expression
+  p(2,4,skin); p(3,4,skin); p(4,4,skinDark); p(5,4,skin);
+
+  // Dark hair on sides + ponytail blowing right
+  p(1,2,hair); p(1,3,hair); p(1,4,hair);
+  p(7,3,hair); p(7,4,hair); p(7,5,hair);
+
+  // Neck
+  p(3,5,skin); p(4,5,skin);
+
+  // Jacket
+  [1,2,5,6].forEach(x => p(x, 5, jacket));
+  [1,2,3,4,5,6].forEach(x => p(x, 6, jacket));
+  p(2,6,jacketL); p(5,6,jacketL);
+  [1,2,3,4,5,6].forEach(x => p(x, 7, jacket));
+  p(3,7,gold); p(4,7,gold); // harness
+  [1,2,3,4,5,6].forEach(x => p(x, 8, jacketL));
+  p(3,8,gold); p(4,8,gold);
+
+  // Arms reaching up for the rock face
+  p(0,4,jacket); p(0,5,jacket); p(0,6,skin); p(0,7,skin);
+  p(7,4,jacket); p(7,5,jacket); p(7,6,skin); p(7,7,skin);
+
+  // Pants
+  [1,2,3,4,5,6].forEach(x => p(x, 9, pants));
+  p(1,10,pantsD); p(2,10,pantsD); p(3,10,pants); p(4,10,pants); p(5,10,pantsD); p(6,10,pantsD);
+
+  // Legs
+  p(1,11,pantsD); p(2,11,pantsD); p(5,11,pantsD); p(6,11,pantsD);
+
+  // Boots (overwrite legs bottom)
+  p(1,11,boot); p(2,11,boot); p(5,11,boot); p(6,11,boot);
+}
+
+
+// ─── STARS ────────────────────────────────────────────────────────
+function addStars() {
+  const sky = document.getElementById('sky');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 1;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      top:${Math.random()*50}%;
+      left:${Math.random()*100}%;
+      animation-delay:${Math.random()*2}s;
+      animation-duration:${1.5+Math.random()*2}s;
+    `;
+    sky.appendChild(s);
+  }
+}
+
+// ─── CLOUDS ────────────────────────────────────────────────────────
+function addClouds() {
+  const wrapper = document.getElementById('gameWrapper');
+  for (let i = 0; i < 4; i++) {
+    const c = document.createElement('div');
+    c.className = 'cloud';
+    const w = 80 + Math.random()*120;
+    const h = 20 + Math.random()*25;
+    c.style.cssText = `
+      width:${w}px; height:${h}px;
+      top:${15+Math.random()*25}%;
+      left:-${w}px;
+      animation-duration:${30+Math.random()*40}s;
+      animation-delay:${Math.random()*-40}s;
+      z-index:3;
+    `;
+    wrapper.appendChild(c);
+  }
+}
+
+// ─── CLIMBER POSITION ──────────────────────────────────────────────
+const climbPositions = [
+  { left: 48,   bottom: 8  },
+  { left: 48.5, bottom: 16 },
+  { left: 49,   bottom: 25 },
+  { left: 49.5, bottom: 35 },
+  { left: 50,   bottom: 45 },
+  { left: 50,   bottom: 57 },
+  { left: 50,   bottom: 70 },
+  { left: 50,   bottom: 83 },
+];
+
+// climberStep tracks the VISUAL position (can differ from current question)
+let climberStep = 0;
+
+function moveClimber(step) {
+  climberStep = Math.max(0, Math.min(step, climbPositions.length - 1));
+  const pos = climbPositions[climberStep];
+  const el = document.getElementById('climber');
+  el.style.transition = 'left 1s ease, bottom 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  el.style.left   = `calc(${pos.left}% - 16px)`;
+  el.style.bottom = `${pos.bottom}%`;
+}
+
+function slipClimber() {
+  const el = document.getElementById('climber');
+  el.style.filter = 'hue-rotate(300deg) brightness(1.4)';
+  setTimeout(() => { el.style.filter = ''; }, 700);
+  climberStep = Math.max(0, climberStep - 1);
+  const pos = climbPositions[climberStep];
+  el.style.transition = 'left 0.3s ease, bottom 0.5s cubic-bezier(0.55, -0.4, 0.7, 1.1)';
+  el.style.left   = `calc(${pos.left}% - 16px)`;
+  el.style.bottom = `${pos.bottom}%`;
+}
+
+// ─── SUN RISE ─────────────────────────────────────────────────────
+function raiseSun(progress) {
+  const sun = document.getElementById('sun');
+  const targetBottom = -80 + (progress / 7) * 220;
+  sun.style.bottom = targetBottom + 'px';
+}
+
+// ─── PROGRESS BAR ─────────────────────────────────────────────────
+function updateProgress(n) {
+  document.getElementById('progressFill').style.width = `${(n/7)*100}%`;
+}
+
+// ─── LOAD QUESTION ─────────────────────────────────────────────────
+function loadQuestion(index) {
+  answered = false;
+  const q = questions[index];
+  // Label shows how many checkpoints she's cleared (climberStep), not the question index
+  document.getElementById('questionLabel').textContent = `CHECKPOINT ${climberStep} OF 7`;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').style.color = '';
+
+  const div = document.getElementById('answersDiv');
+  div.innerHTML = '';
+  q.answers.forEach((a, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = a;
+    btn.onclick = () => handleAnswer(i);
+    div.appendChild(btn);
+  });
+}
+
+// ─── HANDLE ANSWER ─────────────────────────────────────────────────
+function handleAnswer(idx) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[current];
+  const btns = document.querySelectorAll('.answer-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const feedback = document.getElementById('feedback');
+
+  if (idx === q.correct) {
+    // ── CORRECT: climb up one step ──
+    btns[idx].classList.add('correct');
+    feedback.textContent = q.fun;
+    feedback.style.color = '#7adb78';
+
+    const nextStep = climberStep + 1;
+    updateProgress(nextStep);
+    raiseSun(nextStep);
+
+    setTimeout(() => {
+      moveClimber(nextStep);   // sets climberStep = nextStep
+      current = climberStep;   // keep current in sync
+      setTimeout(() => {
+        if (climberStep >= 7) {
+          beginSummitClimb();
+        } else {
+          loadQuestion(current);
+        }
+      }, 1300);
+    }, 700);
+
+  } else {
+    // ── WRONG: flash, slip back one, reload a fresh question at same checkpoint ──
+    btns[idx].classList.add('wrong');
+    btns[q.correct].classList.add('correct');
+    feedback.textContent = "Try not to fall down >:)";
+    feedback.style.color = '#ff9a6b';
+    document.getElementById('questionBox').classList.add('shake');
+
+    setTimeout(() => { slipClimber(); }, 300);  // climberStep-- inside slipClimber
+
+    setTimeout(() => {
+      document.getElementById('questionBox').classList.remove('shake');
+
+      // current follows climberStep after the slip
+      current = climberStep;
+      updateProgress(climberStep);
+      raiseSun(climberStep);
+
+      // Swap in a fresh question so she can't just retry the same one
+      const unused = questionLibrary.filter(ql =>
+        !questions.some(q2 => q2.q === ql.q)
+      );
+      if (unused.length > 0) {
+        const replacement = unused[Math.floor(Math.random() * unused.length)];
+        questions[current] = replacement;
+      }
+
+      setTimeout(() => { loadQuestion(current); }, 600);
+    }, 2200);
+  }
+}
+
+// ─── CINEMATIC SUMMIT SEQUENCE ─────────────────────────────────────
+function beginSummitClimb() {
+  // Hide the quiz UI
+  const ui = document.getElementById('ui');
+  ui.style.transition = 'opacity 0.8s ease';
+  ui.style.opacity = '0';
+  setTimeout(() => { ui.style.display = 'none'; }, 800);
+
+  // Animate climber up to the very peak over 2.5s
+  const el = document.getElementById('climber');
+  el.style.transition = 'left 2.5s ease-in-out, bottom 2.5s cubic-bezier(0.4, 0, 0.2, 1)';
+  el.style.left   = 'calc(50% - 16px)';
+  el.style.bottom = '90%';
+
+  // After climber reaches the top, do the big reveal
+  setTimeout(() => {
+    doSunriseReveal();
+  }, 2800);
+}
+
+function doSunriseReveal() {
+  const wrapper  = document.getElementById('gameWrapper');
+  const climber  = document.getElementById('climber');
+  const sun      = document.getElementById('sun');
+
+  // Flash white like cresting into sunlight
+  const flash = document.createElement('div');
+  flash.style.cssText = `
+    position:fixed; inset:0; background:white; z-index:90;
+    opacity:0; transition:opacity 0.4s ease; pointer-events:none;
+  `;
+  wrapper.appendChild(flash);
+
+  setTimeout(() => { flash.style.opacity = '1'; }, 100);
+
+  setTimeout(() => {
+    // Hide the mountain and climber — now we see pure sunrise sky
+    document.getElementById('mountainCanvas').style.opacity = '0';
+    document.getElementById('mountainCanvas').style.transition = 'opacity 1.8s ease';
+    document.getElementById('mist').style.opacity = '0';
+    climber.style.opacity = '0';
+
+    // Burst the sun to full glory — large and dramatic
+    sun.style.transition = 'bottom 2.5s ease, box-shadow 2.5s ease, width 2.5s ease, height 2.5s ease, left 2.5s ease, transform 2.5s ease';
+    sun.style.bottom     = '28%';
+    sun.style.width      = '220px';
+    sun.style.height     = '220px';
+    sun.style.left       = 'calc(50% - 110px)';
+    sun.style.transform  = 'none';
+    sun.style.boxShadow  = '0 0 100px #ffd700, 0 0 220px #ffaa00, 0 0 420px rgba(255,200,80,0.55), 0 0 600px rgba(255,160,40,0.25)';
+
+    // Shift sky to full golden sunrise
+    document.getElementById('sky').style.background = `linear-gradient(to bottom,
+      #1a1060 0%,
+      #4a2070 10%,
+      #a03060 25%,
+      #e06040 45%,
+      #f09040 62%,
+      #f8c060 78%,
+      #fde8a0 90%,
+      #fff8e0 100%
+    )`;
+
+    // Fade the flash out slowly revealing the new sky
+    flash.style.transition = 'opacity 1.4s ease';
+    flash.style.opacity = '0';
+
+    setTimeout(() => {
+      flash.remove();
+      showValentineMessage();
+    }, 1800);
+  }, 600);
+}
+function showValentineMessage() {
+  const wrapper = document.getElementById('gameWrapper');
+
+  // Create a dedicated canvas for the summit silhouette scene
+  const sceneCanvas = document.createElement('canvas');
+  sceneCanvas.width  = window.innerWidth;
+  sceneCanvas.height = window.innerHeight;
+  sceneCanvas.style.cssText = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    z-index:60; opacity:0; transition:opacity 2s ease; pointer-events:none;
+  `;
+  wrapper.appendChild(sceneCanvas);
+  drawSummitScene(sceneCanvas);
+  setTimeout(() => { sceneCanvas.style.opacity = '1'; }, 100);
+
+  // After silhouette fades in, show the text
+  setTimeout(() => {
+    const vs  = document.getElementById('valentineScreen');
+    const msg = document.getElementById('valentineMsg');
+    vs.style.display    = 'flex';
+    vs.style.background = 'transparent';
+    vs.style.zIndex     = '70';
+    msg.innerHTML = `
+      <span style="font-size:0.6em;color:#f4b96b;display:block;margin-bottom:18px;letter-spacing:5px;">EVA SINGH</span>
+      May I be your<br>Valentine?
+      <br><br>
+      <span style="font-size:0.6em;color:#f4b96b;display:block;margin-bottom:18px;letter-spacing:5px;">(Text me ur answer on Insta lol)</span>
+      <span class="pixel-heart" style="font-size:1.2em;">♥</span>
+    `;
+    setTimeout(() => {
+      vs.classList.add('active');
+      msg.classList.add('reveal');
+    }, 300);
+  }, 2200);
+}
+
+function drawSummitScene(canvas) {
+  const ctx = canvas.getContext('2d');
+  const W   = canvas.width;
+  const H   = canvas.height;
+
+  // Sky already showing sunrise — just draw the silhouette scene on top
+  // Rocky summit ridge at bottom 28% of screen
+  const ridgeY = H * 0.72;
+
+  // Layered distant mountain silhouettes
+  ctx.fillStyle = 'rgba(40,20,35,0.55)';
+  ctx.beginPath();
+  ctx.moveTo(0, ridgeY + 20);
+  ctx.lineTo(W * 0.1, ridgeY - H * 0.12);
+  ctx.lineTo(W * 0.22, ridgeY - H * 0.06);
+  ctx.lineTo(W * 0.35, ridgeY - H * 0.18);
+  ctx.lineTo(W * 0.5,  ridgeY - H * 0.08);
+  ctx.lineTo(W * 0.65, ridgeY - H * 0.20);
+  ctx.lineTo(W * 0.78, ridgeY - H * 0.10);
+  ctx.lineTo(W * 0.9,  ridgeY - H * 0.14);
+  ctx.lineTo(W, ridgeY - H * 0.04);
+  ctx.lineTo(W, H); ctx.lineTo(0, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // Closer ridge (darker)
+  ctx.fillStyle = 'rgba(20,10,15,0.75)';
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  ctx.lineTo(0, ridgeY + H * 0.05);
+  ctx.bezierCurveTo(W*0.15, ridgeY - H*0.05, W*0.3, ridgeY + H*0.02, W*0.42, ridgeY - H*0.03);
+  ctx.bezierCurveTo(W*0.48, ridgeY - H*0.06, W*0.52, ridgeY - H*0.06, W*0.58, ridgeY - H*0.02);
+  ctx.bezierCurveTo(W*0.7, ridgeY + H*0.03, W*0.85, ridgeY - H*0.04, W, ridgeY + H*0.02);
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // Rocky ledge the figure sits on
+  ctx.fillStyle = '#1e1008';
+  ctx.beginPath();
+  ctx.ellipse(W * 0.5, ridgeY, W * 0.12, H * 0.025, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Small rocks
+  [[W*0.38, ridgeY-4],[W*0.62, ridgeY-6],[W*0.44, ridgeY+8]].forEach(([rx,ry])=>{
+    ctx.beginPath();
+    ctx.ellipse(rx, ry, 12, 7, Math.random()*0.4, 0, Math.PI*2);
+    ctx.fillStyle = '#1a0e06';
+    ctx.fill();
+  });
+
+  // ── FIGURE silhouette ──
+  const cx = W * 0.5;
+  const gy = ridgeY;
+
+  ctx.save();
+  const sc = Math.min(W, H) * 0.0013;
+  ctx.translate(cx, gy);
+  ctx.scale(sc, sc);
+
+  const sil = '#120808';
+
+  // Legs hanging over ledge
+  ctx.fillStyle = sil;
+  ctx.fillRect(-24, 6,  14, 22);
+  ctx.fillRect(10,  6,  14, 22);
+  // Feet
+  ctx.beginPath();
+  ctx.ellipse(-17, 30, 10, 6, 0.2, 0, Math.PI*2);
+  ctx.ellipse(17,  30, 10, 6, -0.2, 0, Math.PI*2);
+  ctx.fill();
+
+  // Body
+  ctx.beginPath();
+  ctx.roundRect(-20, -32, 40, 40, [4,4,2,2]);
+  ctx.fill();
+
+  // Left arm resting on knee, leaning forward slightly
+  ctx.save();
+  ctx.translate(-20, -8);
+  ctx.rotate(0.3);
+  ctx.fillRect(0, -5, 28, 9);
+  ctx.restore();
+
+  // Right arm raised, pointing at the horizon / sun
+  ctx.save();
+  ctx.translate(20, -20);
+  ctx.rotate(-0.55);
+  ctx.fillRect(0, -5, 32, 9);
+  ctx.restore();
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(0, -48, 19, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Long dark hair blowing gently in breeze (right)
+  ctx.beginPath();
+  ctx.moveTo(-14, -64);
+  ctx.bezierCurveTo(-24, -50, -36, -22, -38, 8);
+  ctx.bezierCurveTo(-30, 2, -20, -22, -10, -44);
+  ctx.closePath();
+  ctx.fillStyle = '#080402';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(6, -64);
+  ctx.bezierCurveTo(20, -54, 32, -36, 28, -8);
+  ctx.bezierCurveTo(18, -16, 12, -36, 2, -52);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+
+  // Soft sun reflection/glow on the figure
+  const glowX = W * 0.5;
+  const glowY = H * 0.35;
+  const grd = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, H * 0.55);
+  grd.addColorStop(0,   'rgba(255,210,100,0.08)');
+  grd.addColorStop(0.5, 'rgba(255,160,60,0.04)');
+  grd.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// ─── START GAME ────────────────────────────────────────────────────
+window.startGame = function startGame() {
+  document.getElementById('titleScreen').style.display = 'none';
+  gameStarted = true;
+  climberStep = 0;
+  current = 0;
+  buildQuestionSet();   // shuffle a fresh set of 7 from the library
+  moveClimber(0);
+  loadQuestion(0);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  drawMountain();
+  renderClimber();
+  addStars();
+  addClouds();
+  moveClimber(0);
+
+  window.addEventListener('resize', () => {
+    mc.width = window.innerWidth;
+    mc.height = window.innerHeight;
+    drawMountain();
+  });
+});
+</script>
+</body>
+</html>
